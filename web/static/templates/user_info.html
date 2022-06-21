@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TOD</title>
+    <link rel="icon" href="data:image/ico;base64,aWNv">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/lq-score.css">
+    <link rel="stylesheet" href="/static/css/demo.css">
+    <script src="/static/js/jquery-3.3.1.min.js"></script>
+    <script src="/static/js/lq-score.min.js"></script>
+</head>
+<body>
+    <input type="text" class="input_box" id="message"/>
+    <input type="button" class="send" value="submit" onclick="send_msg()">
+<script type="application/javascript">
+    function send_msg(){
+        var msg = document.getElementById("message").value;
+        data = {
+            user:msg,
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                response = JSON.parse(xhr.response)
+                console.log(response)
+                status = response['status']
+                if(status == 0){
+                    alert("Username doesn't exits!")
+                    return
+                }
+                finish = response['finish']
+                alert("You have finished " + finish + " dialogues.")
+            }
+        }
+        xhr.open("POST", "/user_info", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(
+            data
+        ));
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TOD</title>
+    <link rel="icon" href="data:image/ico;base64,aWNv">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/lq-score.css">
+    <link rel="stylesheet" href="/static/css/demo.css">
+    <script src="/static/js/jquery-3.3.1.min.js"></script>
+    <script src="/static/js/lq-score.min.js"></script>
+</head>
+<body>
+<div class="knowledge" id="knowledge_full">
+    <p><input type="text" id="username" style="width:85px;">
+        <button onclick="open_ws()" id="button">Sign in</button>
+        <button onclick="do_alert()" id="alert_button">AlertOff</button>
+        <button onclick="start_dialog()" id="match" class="match">Start</button>
+    </p>
+    <div class="knowledge_box" id="knowledge_area">
+        <button onclick="multiwoz()" id="multiwoz" style="background-color: #b6b2b2;display: none">multiwoz</button>
+        <button onclick="redial()" id="redial" style="display:none;">redial</button>
+        <div class="goal" id="page1" ></div>
+        <div class="goal" id="page2" style="display: none"></div>
+        <div class="judge" id="judge" style="display: none">
+
+            <h3>&nbsp;&nbsp;&nbsp;&nbsp;Success</h3>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="success" value="1" id="success1"><label for="success1">1: NO, some of my needs are not being met.</label><br>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="success" value="2" id="success2"><label for="success2">2: YES, the system meets all my needs.</label><br>
+
+            <h3>&nbsp;&nbsp;&nbsp;&nbsp;Efficiency</h3>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="efficiency" value="1" id="efficiency1"><label for="efficiency1">1: NO, this system is inefficient.</label><br>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="efficiency" value="2" id="efficiency2"><label for="efficiency2">2: YES, this system is efficient.</label><br>
+
+            <h3>&nbsp;&nbsp;&nbsp;&nbsp;Naturalness</h3>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="naturalness" value="1" id="naturalness1"><label for="naturalness1">1: NO, the response of the system or dialogue flow is unnatural.</label><br>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="naturalness" value="2" id="naturalness2"><label for="naturalness2">2: Fair.</label><br>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="naturalness" value="3" id="naturalness3"><label for="naturalness3">3: Yes, the conversation is very natural, just like talking to a human.</label><br>
+
+            <h3>&nbsp;&nbsp;&nbsp;&nbsp;Satisfaction</h3>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="satisfaction" value="1" id="satisfaction1"><label for="satisfaction1">1: Very bad, the experience of using this system is extremely bad.</label><br>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="satisfaction" value="2" id="satisfaction2"><label for="satisfaction2">2: Bad, I am not satisfied with the system</label><br>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="satisfaction" value="3" id="satisfaction3"><label for="satisfaction3">3: Fair.</label><br>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="satisfaction" value="4" id="satisfaction4"><label for="satisfaction4">4: Good, I am satisfied with the system, my experience with it is good.</label><br>
+            &nbsp;&nbsp;&nbsp;<input type="radio" name="satisfaction" value="5" id="satisfaction5"><label for="satisfaction5">5: Very good, I am very satisfied with this system.</label><br>
+
+
+            <input type="button" value="submit" class="submit" onclick="submit_dialog()">
+        </div>
+    </div>
+</div>
+<!-- partial:index.partial.html -->
+<div class="container">
+    <div class="instruction">
+        <div id="show_instruction">
+            <p>Login to the system using your username and click on Start.</p>
+            <p>Click send or enter to send the message. Then wait for a response.</p>
+            <p>When you think the conversation is ready to end, click End. Then rate the system and click on submit.</p>
+        </div>
+    </div>
+    <div class="imessage" id="message_box">
+
+    </div>
+    <input type="text" onkeydown="keyup_submit(event);" class="input_box" id="message"/>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="button" class="send" value="send" onclick="send_msg()">
+</div>
+<!-- partial -->
+<script type="application/javascript">
+    let socket = new WebSocket("wss://javascript.info/article/websocket/chat/ws");
+    var button = document.getElementById('button');
+    var dialog_button = document.getElementById('match');
+    var alert_button = document.getElementById('alert_button');
+    var multiwoz_button = document.getElementById('multiwoz')
+    var redial_button = document.getElementById('redial')
+
+    var page1 = document.getElementById('page1');
+    var page2 = document.getElementById('page2');
+    var judge = document.getElementById('judge');
+
+    var user_name = "";
+    var dialogue = [];
+    var orgin_dialogue = [];
+    var system = "";
+    var task = "";
+    var message = "";
+    var cache = {};
+
+    page1.style.display = '';
+
+    var is_start = false;
+    var in_dialog = false;
+    var waiting = false;
+    var waiting_res = false;
+    var choose_movie = false;
+    var alert_on = false;
+    var goal_data = 0
+    var movie_seen = []
+    var movie_like = []
+    var movie_unlike = []
+    var goal = {};
+    var goal_str = "";
+
+    function open_ws() {
+        if (is_start) {
+            button.innerHTML = "Sign in";
+            dialog_button.innerHTML = "Start";
+            document.title = 'TOD';
+            var chat_content = document.getElementById("message_box");
+            chat_content.innerHTML = "";
+            page1.innerHTML = "";
+            page2.innerHTML = "";
+            document.getElementById("message").value = "";
+            user_name = "";
+            dialogue = [];
+            orgin_dialogue = [];
+            system = "";
+            task = "";
+            message = "";
+            cache = {};
+            is_start = false;
+            in_dialog = false;
+            waiting = false;
+            waiting_res = false;
+            choose_movie = false;
+            alert_on = true;
+            goal_data = 0
+            movie_seen = []
+            movie_like = []
+            movie_unlike = []
+            goal = {};
+            goal_str = "";
+            return
+        }else {
+            is_start = true;
+            button.innerHTML = "Sign out";
+            user_name = document.getElementById('username').value;
+            return
+        }
+    }
+
+    function get_goal(){
+        data = {
+            user:user_name
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.response === "error"){
+                    alert("User doesn't exit. Please check your username!")
+                    return
+                }
+                if (xhr.response === "end"){
+                    alert("You have complete all tasks!")
+                    return
+                }
+                data = JSON.parse(xhr.response)
+                console.log(data)
+                goal = data["goal"]
+                goal_str = data["goal_str"]
+                system = data["system"]
+                task = data["task"]
+                message = data["message"]
+                html_goal = ""
+                for (var key in goal) {
+                    html_goal = html_goal + "\n" + "<h3>" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + key + "</h3>";
+                    for (var key_domain in goal[key]) {
+                        html_goal = html_goal + "\n" + "<p>" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + key_domain + " : " + goal[key][key_domain] + "</p>";
+                    }
+                }
+                html_goal = html_goal + "<HR>" + message;
+                page1.innerHTML = html_goal;
+                dialog_button.innerHTML = "End";
+                waiting_res = false;
+            }
+        }
+        xhr.open("POST", "/goal", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(
+            data
+        ));
+    }
+
+    function start_dialog(){
+        if (!is_start) {
+            alert("Log in first!")
+            document.getElementById("message").value = "";
+            return
+        }
+        if(in_dialog){
+            if(choose_movie){
+                choose_movie = false
+                $('input[name="movie_seen"]:checked').each(function(){
+                    movie_seen.push($(this).val());
+                });
+                $('input[name="movie_like"]:checked').each(function(){
+                    movie_like.push($(this).val());
+                });
+                $('input[name="movie_unlike"]:checked').each(function(){
+                    movie_unlike.push($(this).val());
+                });
+                // console.log(movie_seen)
+                // console.log(movie_like)
+                // console.log(movie_unlike)
+                dialog_button.innerHTML = "End"
+                html_goal = ""
+                html_goal = html_goal + "<h2>seen</h2>"
+                for(var seen in movie_seen){
+                    html_goal = html_goal + "\n" + "<b>" + movie_seen[seen] + "</b><br>"
+                }
+                html_goal = html_goal + "<h2>like</h2>"
+                for(var seen in movie_like){
+                    html_goal = html_goal + "\n" + "<b>" + movie_like[seen] + "</b><br>"
+                }
+                html_goal = html_goal + "<h2>unlike</h2>"
+                for(var seen in movie_unlike){
+                    html_goal = html_goal + "\n" + "<b>" + movie_unlike[seen] + "</b><br>"
+                }
+                page2.innerHTML = html_goal
+            }else {
+                if(waiting_res){
+                    return;
+                }
+                waiting = false
+                dialog_button.style.display = "none"
+                page1.style.height = "30%"
+                judge.style.display = ""
+            }
+        }else {
+            in_dialog = true;
+            waiting_res = true;
+            if(goal_data === 0){
+                get_goal()
+            }else {
+                data = {
+                    user:user_name
+                }
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        data = JSON.parse(xhr.response)
+                        console.log(data)
+                        movie_list = data["movie"]
+                        html_goal = ""
+                        for(var movie in movie_list){
+                            html_goal = html_goal + "\n" + "<input type='checkbox' name='movie_seen'" + " value='" + movie_list[movie][0] +"'" + ">" + "</input>";
+                            html_goal = html_goal + "\n" + "<input type='checkbox' name='movie_like'" + " value='" + movie_list[movie][0] +"'" + ">" + "</input>";
+                            html_goal = html_goal + "\n" + "<input type='checkbox' name='movie_unlike'" + " value='" + movie_list[movie][0] +"'" + ">" + "</input>";
+                            html_goal = html_goal + "<b>" + movie_list[movie][0] + "</b>"
+                            html_goal = html_goal + "\n" + "<p>" + movie_list[movie][1] + "</p>";
+                        }
+                        html_goal = html_goal + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick='next_choose()' id='next_choose'>next</button>"
+                        page2.innerHTML = html_goal;
+                    }
+                }
+                xhr.open("POST", "/movie", true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify({
+                    user:user_name
+                }));
+
+                dialog_button.innerHTML = "Choose"
+                choose_movie = true
+            }
+        }
+    }
+
+    function keyup_submit(e){
+        var evt = window.event || e;
+        if (evt.keyCode == 13){
+            send_msg()
+        }
+    }
+
+    function sleep (time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+    }
+
+    function get_response(chat_content){
+        data = {
+            user:user_name,
+            context: dialogue,
+            goal_str:goal_str,
+            system: system,
+            task:task,
+            cache:JSON.stringify(cache),
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                response = JSON.parse(xhr.response)
+                console.log(response)
+                cache = JSON.parse(response["cache"])
+                response = response["response"]
+                origin = response["origin"]
+                status = response['status']
+                if (status === 0){
+                    alert('System busy.Please refresh the page and try again.')
+                    return
+                }
+
+                console.log(cache)
+                if(waiting){
+                    chat_content.innerHTML = chat_content.innerHTML + "\n" + "<p class=\"from-them\">" + response.replace("system :", "").replace("system: ", "") + "</p>";
+                    chat_content.scrollTop = chat_content.scrollHeight
+                    if(alert_on){
+                        alert('New response!')
+                    }
+                    waiting = false
+                    dialogue.push(response);
+                    orgin_dialogue.push(origin);
+                    console.log(dialogue)
+                }
+            }
+        }
+        xhr.open("POST", "/response", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(
+            data
+        ));
+    }
+
+    function send_msg() {
+        var chat_content = document.getElementById("message_box");
+        var msg = document.getElementById("message").value;
+        if (!is_start) {
+            alert("Log in first!")
+            return
+        }
+        if (!in_dialog) {
+            alert("Start a dialogue first!")
+            return
+        }
+        if (goal_data === 1 && choose_movie) {
+            alert("Choose movies first!")
+            return
+        }
+        if (msg == ""){
+            alert("Please enter the conversation content!")
+            return;
+        }
+        if(waiting){
+            alert("Please wait for the system reply before proceeding to the next conversation!")
+            return
+        }
+        document.getElementById("message").value = "";
+        chat_content.innerHTML = chat_content.innerHTML + "\n" + "<p class=\"from-me\">" + msg + "</p>";
+        chat_content.scrollTop = chat_content.scrollHeight
+        msg = "user :" + msg
+        dialogue.push(msg);
+        orgin_dialogue.push(msg);
+        console.log(dialogue)
+        waiting = true;
+        get_response(chat_content);
+    }
+    function do_alert(){
+        if (alert_on){
+            alert_on = false;
+            alert_button.innerHTML = 'AlertOff';
+        }
+        else {
+            alert_on = true;
+            alert_button.innerHTML = 'AlertOn';
+            alert('开启新消息提醒！')
+        }
+    }
+
+    function send_data(data){
+        console.log(data)
+        return
+    }
+
+    function submit_dialog(){
+        satisfaction = $("input[name='satisfaction']:checked").val();
+        success = $("input[name='success']:checked").val();
+        efficiency = $("input[name='efficiency']:checked").val();
+        naturalness = $("input[name='naturalness']:checked").val();
+        if(satisfaction == undefined || success == undefined || efficiency == undefined || naturalness == undefined){
+            alert("Rate all scores please!")
+            return
+        }
+        waiting_res = true;
+        if(goal_data === 0){
+                var data_send = {
+                    user:user_name,
+                    context: dialogue,
+                    origin:orgin_dialogue,
+                    goal: goal_str,
+                    system:system,
+                    task: task,
+                    satisfaction:satisfaction,
+                    success:success,
+                    efficiency:efficiency,
+                    naturalness:naturalness,
+                    state:cache
+                }
+                console.log(data_send)
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        data = JSON.parse(xhr.response)
+                        console.log(data)
+                        stat = data["stat"]
+                        if(stat === 1){
+                            alert("Submit failed, try again please.")
+                            return
+                        }
+                        dialogue = []
+                        orgin_dialogue = []
+                        cache = {}
+                        waiting_res = false;
+                        waiting = false
+                        dialog_button.style.display = ""
+                        judge.style.display = "none"
+                        var input_value = document.getElementsByName('satisfaction')
+                        for(var i = 0; i < input_value.length; i++){
+                            input_value[i].checked = false
+                        }
+                        input_value = document.getElementsByName('success')
+                        for(i = 0; i < input_value.length; i++){
+                            input_value[i].checked = false
+                        }
+                        input_value = document.getElementsByName('efficiency')
+                        for(i = 0; i < input_value.length; i++){
+                            input_value[i].checked = false
+                        }
+                        input_value = document.getElementsByName('naturalness')
+                        for(i = 0; i < input_value.length; i++){
+                            input_value[i].checked = false
+                        }
+                        var chat_content = document.getElementById("message_box");
+                        chat_content.innerHTML = "";
+
+                        document.getElementById("message").value = "";
+                        page1.style.height = "95%"
+                        get_goal()
+                    }
+                }
+                xhr.open("POST", "/save", true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify(
+                    data_send
+                ));
+        }else {
+            movie_seen = []
+            movie_like = []
+            movie_unlike = []
+            movie_index = movie_index + 1
+            html_goal = ""
+            for(var movie in movie_list[movie_index]){
+                html_goal = html_goal + "\n" + "<input type='checkbox' name='movie_seen'" + " value='" + movie_list[movie_index][movie][0] +"'" + ">" + "</input>";
+                html_goal = html_goal + "\n" + "<input type='checkbox' name='movie_like'" + " value='" + movie_list[movie_index][movie][0] +"'" + ">" + "</input>";
+                html_goal = html_goal + "\n" + "<input type='checkbox' name='movie_unlike'" + " value='" + movie_list[movie_index][movie][0] +"'" + ">" + "</input>";
+                html_goal = html_goal + "<b>" + movie_list[movie_index][movie][0] + "</b>"
+                html_goal = html_goal + "\n" + "<p>" + movie_list[movie_index][movie][1] + "</p>";
+            }
+            html_goal = html_goal + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick='next_choose()' id='next_choose'>next</button>"
+            page2.innerHTML = html_goal;
+            choose_movie = true
+            dialog_button.innerHTML = "Choose"
+        }
+
+        var chat_content = document.getElementById("message_box");
+        chat_content.innerHTML = "";
+        document.getElementById("message").value = "";
+    }
+
+    function check_start(){
+        if(in_dialog){
+            in_dialog = false
+            dialog_button.innerHTML = "Start"
+            var chat_content = document.getElementById("message_box");
+            chat_content.innerHTML = "";
+            document.getElementById("message").value = "";
+            page1.innerHTML = ""
+            page2.innerHTML = ""
+        }
+    }
+
+    function multiwoz(){
+        if (!is_start) {
+            alert("Log in first!")
+            return
+        }
+        check_start()
+        page1.style.display = ""
+        multiwoz_button.style.backgroundColor = "#b6b2b2"
+        redial_button.style.backgroundColor = ""
+        page2.style.display = "none"
+        goal_data = 0
+    }
+
+    function redial(){
+        if (!is_start) {
+            alert("Log in first!")
+            return
+        }
+        check_start()
+        page1.style.display = "none"
+        multiwoz_button.style.backgroundColor = ""
+        redial_button.style.backgroundColor = "#b6b2b2"
+        page2.style.display = ""
+        goal_data = 1
+    }
+
+    function next_choose(){
+        $('input[name="movie_seen"]:checked').each(function(){
+            movie_seen.push($(this).val());
+        });
+        $('input[name="movie_like"]:checked').each(function(){
+            movie_like.push($(this).val());
+        });
+        $('input[name="movie_unlike"]:checked').each(function(){
+            movie_unlike.push($(this).val());
+        });
+        data = {
+            user:user_name
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                data = JSON.parse(xhr.response)
+                console.log(data)
+                movie_list = data["movie"]
+                html_goal = ""
+                for(var movie in movie_list){
+                    html_goal = html_goal + "\n" + "<input type='checkbox' name='movie_seen'" + " value='" + movie_list[movie][0] +"'" + ">" + "</input>";
+                    html_goal = html_goal + "\n" + "<input type='checkbox' name='movie_like'" + " value='" + movie_list[movie][0] +"'" + ">" + "</input>";
+                    html_goal = html_goal + "\n" + "<input type='checkbox' name='movie_unlike'" + " value='" + movie_list[movie][0] +"'" + ">" + "</input>";
+                    html_goal = html_goal + "<b>" + movie_list[movie][0] + "</b>"
+                    html_goal = html_goal + "\n" + "<p>" + movie_list[movie][1] + "</p>";
+                }
+                html_goal = html_goal + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick='next_choose()' id='next_choose'>next</button>"
+                page2.innerHTML = html_goal;
+            }
+        }
+        xhr.open("POST", "/movie", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+            user:user_name
+        }));
+    }
+</script>
+</body>
+</html>
+
+

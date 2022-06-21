@@ -1,0 +1,339 @@
+.imessage {
+    background-color: #fff;
+    border: 1px solid #e5e5ea;
+    border-radius: .25rem;
+    display: flex;
+    flex-direction: column;
+    font-family: "SanFrancisco";
+    font-size: 1rem;
+    margin: 0 auto 1rem;
+    max-width: 100%;
+    height: 85%;
+    overflow-y: auto;
+    padding: .5rem 1.5rem;
+}
+
+.instruction {
+    background-color: #fff;
+    border: 1px solid #e5e5ea;
+    border-radius: .25rem;
+    font-family: "SanFrancisco";
+    font-size: 0.85rem;
+    margin: 0 auto 1rem;
+    max-width: 100%;
+    height: 12%;
+    overflow-y: auto;
+    padding: .5rem 1.5rem;
+}
+
+.imessage p {
+    border-radius: 1.15rem;
+    line-height: 1.25;
+    max-width: 75%;
+    padding: .5rem 1.15rem;
+    position: relative;
+    word-wrap: break-word
+}
+
+.imessage p::before, .imessage p::after {
+    bottom: -0.1rem;
+    content: "";
+    height: 1rem;
+    position: absolute
+}
+
+.imessage p:first-child:not(p.from-them) {
+    margin-top: .5rem;
+    margin-bottom: 0
+}
+
+.imessage p.from-them:not(:first-child) {
+    margin-bottom: .5rem
+}
+
+.imessage p:last-child {
+    margin-bottom: .5rem
+}
+
+p.from-me {
+    align-self: flex-end;
+    background-color: #248bf5;
+    color: #fff
+}
+
+p.from-me::before {
+    border-bottom-left-radius: .8rem .7rem;
+    border-right: 1rem solid #248bf5;
+    right: -0.35rem;
+    transform: translate(0, -0.1rem)
+}
+
+p.from-me::after {
+    background-color: #fff;
+    border-bottom-left-radius: .5rem;
+    right: -40px;
+    transform: translate(-30px, -2px);
+    width: 10px
+}
+
+p.from-me, p.from-them {
+    margin: .5rem 0;
+    width: fit-content
+}
+
+p.from-me ~ p.from-me {
+    margin: .25rem 0 0
+}
+
+p.from-me ~ p.from-me:not(:last-child) {
+    margin: .25rem 0 0
+}
+
+p.from-me ~ p.from-me:last-child {
+    margin-bottom: .5rem
+}
+
+p.from-them {
+    align-items: flex-start;
+    background-color: #e5e5ea;
+    color: #000
+}
+
+p.from-them:before {
+    border-bottom-right-radius: .8rem .7rem;
+    border-left: 1rem solid #e5e5ea;
+    left: -0.35rem;
+    transform: translate(0, -0.1rem)
+}
+
+p.from-them::after {
+    background-color: #fff;
+    border-bottom-right-radius: .5rem;
+    left: 20px;
+    transform: translate(-30px, -2px);
+    width: 10px
+}
+
+.no-tail::before {
+    display: none
+}
+
+.margin-b_none {
+    margin-bottom: 0 !important
+}
+
+.margin-b_one {
+    margin-bottom: 1rem !important
+}
+
+.margin-t_one {
+    margin-top: 1rem !important
+}
+
+@font-face {
+    font-family: "SanFrancisco";
+    src: url("https://cdn.rawgit.com/AllThingsSmitty/fonts/25983b71/SanFrancisco/sanfranciscodisplay-regular-webfont.woff2") format("woff2"), url("https://cdn.rawgit.com/AllThingsSmitty/fonts/25983b71/SanFrancisco/sanfranciscodisplay-regular-webfont.woff") format("woff")
+}
+html {
+    height: 100%;
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-weight: normal;
+    margin: 0;
+    height: 100%;
+}
+
+.knowledge{
+    /*margin: 0 auto;*/
+    background-color: #e9ecef;
+    /*background-color: #dcecdc;*/
+    width: 95%;
+    height: 35%;
+    padding: 0.5rem;
+    float: left;
+}
+
+.knowledge_box {
+    background-color: #e9ecef;
+    border: 1px solid #e5e5ea;
+    border-radius: .25rem;
+    font-size: 0.85rem;
+    height:100%;
+    width:100%;
+    overflow-y: auto;
+    overflow-x: auto;
+    /*text-align: center;*/
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    /*padding: .5rem 1.5rem;*/
+}
+
+.container {
+    /*margin: 0 auto;*/
+    width: 60%;
+    padding: 0.5rem;
+    float: right;
+    height:95%;
+}
+
+.goal {
+    /*margin: 0 auto;*/
+    width: 100%;
+    border-radius: .7rem;
+    /*margin: .5rem 1.5rem;*/
+    /*padding: .5rem 1.5rem;*/
+    float: right;
+    height:95%;
+    font-size: 1.2rem;
+    background-color: #ffffff;
+    margin-bottom: .4rem;
+    padding-left: .5rem;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+.emphasis{
+    font-weight: bold;
+}
+
+.judge {
+    /*margin: 0 auto;*/
+    width: 100%;
+    /*padding-left: 1.5rem;*/
+    /*margin-left: 1rem;*/
+    border-radius: .7rem;
+    float: right;
+    height:65%;
+    background-color: #ffffff;
+    text-align: left;
+    overflow-y: auto;
+    overflow-x: auto;
+    /*align-items: center;*/
+}
+.submit{
+    width:100px;
+    display:block;
+    margin:0 auto;
+}
+
+h1 {
+    font-weight: normal;
+    margin-bottom: .5rem
+}
+
+/*h2 {*/
+/*    border-bottom: 1px solid #e5e5ea;*/
+/*    color: #666;*/
+/*    font-weight: normal;*/
+/*    margin-top: 0;*/
+/*    padding-bottom: 1.5rem*/
+/*}*/
+
+.comment {
+    color: #222;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+    max-width: 100%;
+    padding: 0
+}
+.input_box{
+    border: 1px solid #ccc;
+    width: 85%;
+    height: 1.5em;
+    border-radius: 3px;
+    padding: 7px 0 7px 5px;
+    font-size: 1rem;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s
+}
+
+.input_box:focus{
+        border-color: #66afe9;
+        outline: 0;
+        -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)
+}
+
+.send { /* 按钮美化 */
+	width: 10%; /* 宽度 */
+	height: 2em; /* 高度 */
+	border-width: 0px; /* 边框宽度 */
+	border-radius: 3px; /* 边框半径 */
+	background: #1E90FF; /* 背景颜色 */
+	cursor: pointer; /* 鼠标移入按钮范围时出现手势 */
+	outline: none; /* 不显示轮廓线 */
+	color: white; /* 字体颜色 */
+	font-size: 1rem; /* 字体大小 */
+    /*float: right;*/
+}
+.send:hover { /* 鼠标移入按钮范围时改变颜色 */
+	background: #5599FF;
+}
+
+.submit { /* 按钮美化 */
+    width: 20%; /* 宽度 */
+    height: 2em; /* 高度 */
+    border-width: 0px; /* 边框宽度 */
+    border-radius: 3px; /* 边框半径 */
+    background: #1E90FF; /* 背景颜色 */
+    cursor: pointer; /* 鼠标移入按钮范围时出现手势 */
+    outline: none; /* 不显示轮廓线 */
+    color: white; /* 字体颜色 */
+    font-size: 1rem; /* 字体大小 */
+    /*float: right;*/
+}
+.submit:hover { /* 鼠标移入按钮范围时改变颜色 */
+    background: #5599FF;
+}
+
+.match { /* 按钮美化 */
+	width: 25%; /* 宽度 */
+	height: 1.5em; /* 高度 */
+	border-width: 0px; /* 边框宽度 */
+	border-radius: 3px; /* 边框半径 */
+	background: #cb0000; /* 背景颜色 */
+	cursor: pointer; /* 鼠标移入按钮范围时出现手势 */
+	outline: none; /* 不显示轮廓线 */
+	color: white; /* 字体颜色 */
+	font-size: 1rem; /* 字体大小 */
+    float: right;
+}
+.match:hover { /* 鼠标移入按钮范围时改变颜色 */
+	background: #ea0000;
+}
+
+@media screen and (max-width: 800px) {
+    body {
+        margin: 0 .5rem
+    }
+
+    .container {
+        padding: .2rem
+    }
+
+    .imessage {
+        font-size: 0.85rem;
+        margin: 0 auto 1rem;
+        max-width: 600px;
+        padding: .25rem .875rem
+    }
+
+    .imessage p {
+        margin: .5rem 0;
+        padding: .5rem .75rem
+    }
+
+    .input_box {
+        font-size: 0.85rem;
+    }
+
+    .knowledge_box {
+        font-size: 0.6rem;
+    }
+}
