@@ -10,6 +10,8 @@ We additionally share the annotation website at `web/`.
 
 The code is developed upon [pytorch](https://pytorch.org/) and [huggingface transformers](https://github.com/huggingface/transformers)
 
+:star2:[New 2022.11] Introduce [Simtester](https://github.com/Superbooming/simtester), an open-source toolkit for evaluating user simulator of TOD.
+
 ## MetaSim
 The code for MetaSim is available at `metasim/`
 * Metaphor retriever code at `metasim/metaphor.py` and `metasim/retrieval.py`
